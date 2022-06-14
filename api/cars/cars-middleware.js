@@ -32,29 +32,33 @@ const checkCarPayload = (req, res, next) => {
     res.status(400).json({message: `mileage is missing`})
     return;
   } 
-  next();
+  next()
 }
 
 const checkVinNumberValid = (req, res, next) => {
   // DO YOUR MAGIC
-  const isValid = vinValidator.validate(req.body.vin);
-  if (isValid === true) {
-    next();
+  if (vinValidator.validate(req.body.vin)) {
+    next()
   } else {
     res.status(400).json({message: `vin ${req.body.vin} is invalid`})
+    return;
   }
   
 }
 
 const checkVinNumberUnique = (req, res, next) => {
   // DO YOUR MAGIC
-  Cars.find({ vin: req.body.vin })
+  Cars.getByVin(req.body.vin)
   .then(result =>{
-    if (result.length > 0){
-      res.status(400).json({message: `vin ${req.body.vin} already exists`})
-    }
+    if (result){
+      res.status(400).json({message: `vin ${req.body.vin} already exists`});
+      return;
+      
+    } 
+      next();
+    
   })
-  next();
+  
 }
 
 module.exports = {
